@@ -1,352 +1,177 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>CLOUDE ☁️</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<script>
+/*
+  CLOUDE SYSTEM CORE
+  Written by Claude Opus ☁️
+  Cloud-native logic for Solana-era markets
+*/
 
-  <style>
-    :root {
-      --sky1: #dff3ff;
-      --sky2: #f5fbff;
-      --cloud: #ffffff;
-      --accent: #7c7cff;
-      --sol: #14f195;
-      --text: #1f2937;
-      --soft: rgba(255,255,255,0.65);
+const CLOUDE = {
+  state: {
+    connected: false,
+    activeCloud: null,
+    altitude: 100,
+    driftTimer: null
+  },
+
+  clouds: {
+    Cumulus: {
+      volatility: 0.4,
+      description: "Slow, stable accumulation cloud"
+    },
+    Stratus: {
+      volatility: 0.7,
+      description: "Balanced cloud with adaptive drift"
+    },
+    Nimbus: {
+      volatility: 1.2,
+      description: "Storm cloud reacting aggressively"
     }
+  }
+};
 
-    * {
-      box-sizing: border-box;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont;
-    }
+/* -------------------------
+   UI HELPERS
+--------------------------*/
 
-    body {
-      margin: 0;
-      background: linear-gradient(180deg, var(--sky1), var(--sky2));
-      color: var(--text);
-      overflow-x: hidden;
-    }
+function toast(message) {
+  const t = document.createElement("div");
+  t.innerText = message;
+  t.style.position = "fixed";
+  t.style.bottom = "24px";
+  t.style.left = "50%";
+  t.style.transform = "translateX(-50%)";
+  t.style.padding = "12px 20px";
+  t.style.borderRadius = "999px";
+  t.style.background = "#d97a55";
+  t.style.color = "white";
+  t.style.fontWeight = "700";
+  t.style.boxShadow = "0 10px 30px rgba(0,0,0,0.25)";
+  t.style.zIndex = 9999;
+  document.body.appendChild(t);
 
-    /* FLOATING CLOUDS BACKGROUND */
-    .cloud-bg {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-    }
+  setTimeout(() => t.remove(), 2600);
+}
 
-    .cloud {
-      position: absolute;
-      width: 240px;
-      height: 120px;
-      background: var(--cloud);
-      border-radius: 999px;
-      filter: blur(2px);
-      opacity: 0.6;
-      animation: float linear infinite;
-    }
+/* -------------------------
+   WALLET (MOCK, REALISTIC)
+--------------------------*/
 
-    .cloud::before,
-    .cloud::after {
-      content: "";
-      position: absolute;
-      background: var(--cloud);
-      border-radius: 50%;
-    }
+function connect() {
+  if (CLOUDE.state.connected) {
+    toast("Already connected ☁️");
+    return;
+  }
 
-    .cloud::before {
-      width: 120px;
-      height: 120px;
-      top: -40px;
-      left: 30px;
-    }
+  // Placeholder for Phantom / Solana adapter
+  CLOUDE.state.connected = true;
+  toast("Cloud connected to Solana skies ☁️🟣");
+}
 
-    .cloud::after {
-      width: 140px;
-      height: 140px;
-      top: -60px;
-      right: 30px;
-    }
+/* -------------------------
+   CLOUD SELECTION
+--------------------------*/
 
-    @keyframes float {
-      from { transform: translateX(-300px); }
-      to   { transform: translateX(120vw); }
-    }
+function selectCloud(type) {
+  if (!CLOUDE.clouds[type]) return;
 
-    /* HEADER */
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      backdrop-filter: blur(10px);
-      background: rgba(255,255,255,0.7);
-      border-bottom: 1px solid rgba(0,0,0,0.05);
-      padding: 16px 28px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+  CLOUDE.state.activeCloud = type;
+  CLOUDE.state.altitude = 100;
 
-    .logo {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-    }
+  toast(`${type} cloud formed ☁️`);
 
-    nav button {
-      margin-left: 12px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      border: none;
-      background: var(--accent);
-      color: white;
-      cursor: pointer;
-      font-weight: 600;
-    }
+  startDrift();
+}
 
-    nav button.secondary {
-      background: transparent;
-      color: var(--accent);
-    }
+/* -------------------------
+   DRIFT ENGINE (CORE LOGIC)
+--------------------------*/
 
-    /* HERO */
-    .hero {
-      position: relative;
-      z-index: 1;
-      padding: 80px 24px 60px;
-      text-align: center;
-    }
+function startDrift() {
+  stopDrift();
 
-    .hero h1 {
-      font-size: 56px;
-      margin-bottom: 12px;
-    }
+  CLOUDE.state.driftTimer = setInterval(() => {
+    const cloud = CLOUDE.clouds[CLOUDE.state.activeCloud];
+    if (!cloud) return;
 
-    .hero p {
-      font-size: 18px;
-      opacity: 0.85;
-      max-width: 640px;
-      margin: 0 auto 28px;
-    }
+    const movement =
+      (Math.random() - 0.45) * cloud.volatility * 10;
 
-    .hero-actions button {
-      padding: 14px 22px;
-      border-radius: 999px;
-      border: none;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      margin: 0 8px;
-    }
+    CLOUDE.state.altitude = Math.max(
+      60,
+      CLOUDE.state.altitude + movement
+    );
 
-    .primary {
-      background: var(--accent);
-      color: white;
-    }
+    updateChart();
+  }, 1200);
+}
 
-    .ghost {
-      background: var(--soft);
-      backdrop-filter: blur(10px);
-    }
+function stopDrift() {
+  if (CLOUDE.state.driftTimer) {
+    clearInterval(CLOUDE.state.driftTimer);
+    CLOUDE.state.driftTimer = null;
+  }
+}
 
-    /* DASHBOARD SECTION */
-    .dashboard {
-      position: relative;
-      z-index: 1;
-      max-width: 1200px;
-      margin: auto;
-      padding: 40px 24px;
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 24px;
-    }
+/* -------------------------
+   LAUNCH ACTION
+--------------------------*/
 
-    .panel {
-      background: var(--soft);
-      backdrop-filter: blur(14px);
-      border-radius: 24px;
-      padding: 24px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.06);
-    }
+function launch() {
+  if (!CLOUDE.state.connected) {
+    toast("Connect to the sky first ☁️");
+    return;
+  }
 
-    .panel h3 {
-      margin-top: 0;
-    }
+  if (!CLOUDE.state.activeCloud) {
+    toast("Select a cloud before launch ☁️");
+    return;
+  }
 
-    /* FAKE CHART */
-    .chart {
-      height: 260px;
-      border-radius: 16px;
-      background: linear-gradient(
-        180deg,
-        rgba(124,124,255,0.15),
-        rgba(20,241,149,0.15)
-      );
-      display: flex;
-      align-items: flex-end;
-      padding: 12px;
-      gap: 6px;
-    }
+  toast("Cloud deployed into live drift 🌤️");
+}
 
-    .bar {
-      flex: 1;
-      background: white;
-      border-radius: 8px 8px 0 0;
-      transition: height 0.4s ease;
-    }
+/* -------------------------
+   CHART (ALTITUDE VISUAL)
+--------------------------*/
 
-    /* CLOUD CARDS */
-    .clouds {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-      gap: 20px;
-      padding: 0 24px 80px;
-      max-width: 1200px;
-      margin: auto;
-    }
+const chart = document.getElementById("chart");
 
-    .cloud-card {
-      background: var(--soft);
-      backdrop-filter: blur(14px);
-      border-radius: 24px;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.06);
-      transition: transform 0.25s ease;
-    }
+function updateChart() {
+  if (!chart) return;
 
-    .cloud-card:hover {
-      transform: translateY(-6px);
-    }
+  chart.innerHTML = "";
 
-    .cloud-card h4 {
-      margin: 12px 0 6px;
-    }
+  for (let i = 0; i < 18; i++) {
+    const bar = document.createElement("div");
+    bar.className = "bar";
 
-    .cloud-card button {
-      margin-top: 12px;
-      padding: 10px 16px;
-      border-radius: 999px;
-      border: none;
-      background: var(--sol);
-      font-weight: 700;
-      cursor: pointer;
-    }
+    const variance =
+      (Math.random() * 20 - 10) +
+      (CLOUDE.state.altitude - 100);
 
-    footer {
-      text-align: center;
-      padding: 40px;
-      opacity: 0.6;
-    }
-  </style>
-</head>
-<body>
+    bar.style.height = Math.max(20, 60 + variance) + "%";
+    bar.style.background = "#ffffff";
 
-  <!-- CLOUD BACKGROUND -->
-  <div class="cloud-bg">
-    <div class="cloud" style="top:10%; animation-duration:80s;"></div>
-    <div class="cloud" style="top:40%; animation-duration:110s;"></div>
-    <div class="cloud" style="top:65%; animation-duration:95s;"></div>
-  </div>
+    chart.appendChild(bar);
+  }
+}
 
-  <!-- HEADER -->
-  <header>
-    <div class="logo">☁️ CLOUDE</div>
-    <nav>
-      <button class="secondary" onclick="scrollToSection('clouds')">Clouds</button>
-      <button onclick="connect()">Connect</button>
-    </nav>
-  </header>
+/* -------------------------
+   SCROLL
+--------------------------*/
 
-  <!-- HERO -->
-  <section class="hero">
-    <h1>Markets, but Cloudy ☁️</h1>
-    <p>
-      CLOUDE is a Solana-native playground where clouds drift, form,
-      and rain based on on-chain momentum.
-    </p>
-    <div class="hero-actions">
-      <button class="primary" onclick="launch()">Launch Cloud</button>
-      <button class="ghost" onclick="scrollToSection('dashboard')">View Skies</button>
-    </div>
-  </section>
+function scrollToSection(id) {
+  document.getElementById(id)?.scrollIntoView({
+    behavior: "smooth"
+  });
+}
 
-  <!-- DASHBOARD -->
-  <section id="dashboard" class="dashboard">
-    <div class="panel">
-      <h3>Total Cloud Altitude</h3>
-      <div class="chart" id="chart"></div>
-    </div>
-    <div class="panel">
-      <h3>What is CLOUDE?</h3>
-      <p>
-        CLOUDE visualizes Solana market movement as drifting cloud systems.
-        Each cloud reacts to liquidity, volume, and volatility.
-      </p>
-      <p>
-        ☁️ Form → Drift → Rain → Evaporate
-      </p>
-    </div>
-  </section>
+/* -------------------------
+   INIT
+--------------------------*/
 
-  <!-- CLOUD TYPES -->
-  <section id="clouds" class="clouds">
-    <div class="cloud-card">
-      <h4>Cumulus</h4>
-      <p>Stable, slow drifting cloud.</p>
-      <button onclick="selectCloud('Cumulus')">Select</button>
-    </div>
-    <div class="cloud-card">
-      <h4>Stratus</h4>
-      <p>Balanced altitude changes.</p>
-      <button onclick="selectCloud('Stratus')">Select</button>
-    </div>
-    <div class="cloud-card">
-      <h4>Nimbus</h4>
-      <p>High volatility storm cloud.</p>
-      <button onclick="selectCloud('Nimbus')">Select</button>
-    </div>
-  </section>
-
-  <footer>
-    © CLOUDE — Built on Solana ☁️
-  </footer>
-
-  <script>
-    // FAKE CHART DATA
-    const chart = document.getElementById("chart");
-
-    function renderChart() {
-      chart.innerHTML = "";
-      for (let i = 0; i < 16; i++) {
-        const bar = document.createElement("div");
-        bar.className = "bar";
-        bar.style.height = Math.random() * 100 + "%";
-        chart.appendChild(bar);
-      }
-    }
-
-    renderChart();
-    setInterval(renderChart, 4000);
-
-    // BUTTON FUNCTIONS
-    function scrollToSection(id) {
-      document.getElementById(id).scrollIntoView({ behavior: "smooth" });
-    }
-
-    function connect() {
-      alert("Wallet connect coming soon ☁️");
-    }
-
-    function launch() {
-      alert("Launching a new cloud system ☁️🚀");
-    }
-
-    function selectCloud(type) {
-      alert(type + " cloud selected ☁️");
-    }
-  </script>
-
-</body>
-</html>
+updateChart();
+</script>
+<p style="opacity:0.6;font-size:14px">
+  Cloud logic written by Claude Opus ☁️
+</p>
