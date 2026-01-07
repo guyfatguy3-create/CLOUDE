@@ -1,217 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>CLOUDE ☁️</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8" />
+<title>CLOUDE ☁️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <style>
-    :root {
-      --cloud-orange: #d97a55;
-      --sky1: #fff3ea;
-      --sky2: #ffffff;
-      --text: #1f2937;
-    }
+<style>
+:root{
+  --opus-orange:#d97a55;
+  --opus-deep:#c86845;
+  --sky-top:#fff2e8;
+  --sky-bottom:#ffffff;
+  --glass:rgba(255,255,255,0.85);
+  --text:#1f2937;
+}
 
-    * {
-      box-sizing: border-box;
-      font-family: Inter, system-ui, sans-serif;
-    }
+*{box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
 
-    body {
-      margin: 0;
-      background: linear-gradient(180deg, var(--sky1), var(--sky2));
-      color: var(--text);
-      min-height: 100vh;
-    }
+body{
+  margin:0;
+  min-height:100vh;
+  background:linear-gradient(180deg,var(--sky-top),var(--sky-bottom));
+  color:var(--text);
+  overflow-x:hidden;
+}
 
-    header {
-      padding: 20px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(255,255,255,0.9);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
+/* STARTUP OVERLAY */
+#boot{
+  position:fixed;
+  inset:0;
+  background:linear-gradient(180deg,var(--sky-top),var(--sky-bottom));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+  transition:opacity .6s ease;
+}
+#boot.hidden{opacity:0;pointer-events:none}
 
-    header h1 {
-      margin: 0;
-      font-size: 22px;
-    }
+.boot-cloud{
+  width:180px;height:90px;
+  background:radial-gradient(circle at 30% 30%,#ffd9c7,var(--opus-orange));
+  border-radius:999px;
+  position:relative;
+  animation:pulse 1.6s ease-in-out infinite;
+}
+.boot-cloud:before,.boot-cloud:after{
+  content:"";
+  position:absolute;
+  background:inherit;
+  border-radius:50%;
+}
+.boot-cloud:before{width:90px;height:90px;top:-40px;left:20px}
+.boot-cloud:after{width:110px;height:110px;top:-55px;right:20px}
 
-    button {
-      padding: 10px 18px;
-      border-radius: 999px;
-      border: none;
-      background: var(--cloud-orange);
-      color: white;
-      font-weight: 700;
-      cursor: pointer;
-    }
+@keyframes pulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.06)}
+}
 
-    .hero {
-      padding: 80px 24px;
-      text-align: center;
-    }
+/* HEADER */
+header{
+  position:sticky;top:0;z-index:10;
+  backdrop-filter:blur(10px);
+  background:var(--glass);
+  padding:18px 28px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+header h1{margin:0;font-size:22px;font-weight:800}
+header span{font-size:13px;opacity:.6}
 
-    .hero h2 {
-      font-size: 48px;
-      margin-bottom: 12px;
-    }
+button{
+  padding:10px 18px;
+  border-radius:999px;
+  border:none;
+  background:linear-gradient(180deg,var(--opus-orange),var(--opus-deep));
+  color:white;
+  font-weight:800;
+  cursor:pointer;
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+button:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(217,122,85,.35)}
+button.secondary{
+  background:transparent;
+  color:var(--opus-orange);
+}
 
-    .hero p {
-      max-width: 640px;
-      margin: 0 auto 24px;
-      opacity: 0.8;
-    }
+/* HERO */
+.hero{
+  padding:90px 24px 70px;
+  text-align:center;
+}
+.hero h2{font-size:52px;margin-bottom:10px}
+.hero p{max-width:640px;margin:0 auto 28px;opacity:.8}
 
-    .dashboard {
-      max-width: 1100px;
-      margin: auto;
-      padding: 40px 24px;
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 24px;
-    }
+/* STATUS */
+#status{
+  font-weight:700;
+  margin-top:18px;
+  color:var(--opus-orange);
+}
 
-    .panel {
-      background: rgba(255,255,255,0.9);
-      border-radius: 24px;
-      padding: 24px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.06);
-    }
+/* DASHBOARD */
+.dashboard{
+  max-width:1100px;
+  margin:auto;
+  padding:40px 24px;
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:24px;
+}
+.panel{
+  background:var(--glass);
+  border-radius:26px;
+  padding:24px;
+  box-shadow:0 20px 40px rgba(0,0,0,.06);
+}
 
-    .chart {
-      display: flex;
-      align-items: flex-end;
-      gap: 6px;
-      height: 240px;
-    }
+/* CLOUD ENERGY */
+.energy{
+  height:12px;
+  border-radius:999px;
+  background:#eee;
+  overflow:hidden;
+}
+.energy span{
+  display:block;
+  height:100%;
+  width:40%;
+  background:linear-gradient(90deg,var(--opus-orange),#ffb38a);
+  transition:width .6s ease;
+}
 
-    .bar {
-      flex: 1;
-      background: var(--cloud-orange);
-      border-radius: 8px 8px 0 0;
-    }
+/* CLOUD TYPES */
+.clouds{
+  max-width:1100px;
+  margin:auto;
+  padding:40px 24px 90px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+}
+.cloud-card{
+  background:var(--glass);
+  border-radius:26px;
+  padding:22px;
+  text-align:center;
+  transition:transform .2s ease;
+}
+.cloud-card:hover{transform:translateY(-6px)}
+.cloud-icon{
+  width:80px;height:40px;
+  margin:0 auto 12px;
+  background:radial-gradient(circle at 30% 30%,#ffd9c7,var(--opus-orange));
+  border-radius:999px;
+}
 
-    .clouds {
-      max-width: 1100px;
-      margin: auto;
-      padding: 40px 24px 80px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-      gap: 20px;
-    }
-
-    .cloud-card {
-      background: rgba(255,255,255,0.9);
-      border-radius: 24px;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.06);
-    }
-
-    footer {
-      text-align: center;
-      padding: 40px;
-      opacity: 0.6;
-      font-size: 14px;
-    }
-  </style>
+/* FOOTER */
+footer{
+  text-align:center;
+  padding:40px;
+  font-size:14px;
+  opacity:.6;
+}
+</style>
 </head>
 
 <body>
 
+<!-- BOOT -->
+<div id="boot">
+  <div>
+    <div class="boot-cloud"></div>
+    <p style="margin-top:18px;font-weight:700;opacity:.7">
+      Initializing cloud systems…
+    </p>
+  </div>
+</div>
+
 <header>
-  <h1>☁️ CLOUDE</h1>
-  <button onclick="connect()">Connect</button>
+  <div>
+    <h1>☁️ CLOUDE</h1>
+    <span>powered by Claude Opus</span>
+  </div>
+  <button id="connectBtn">Connect</button>
 </header>
 
 <section class="hero">
-  <h2>Markets, but Cloudy ☁️</h2>
+  <h2>Markets, but Cloudy</h2>
   <p>
-    CLOUDE visualizes market drift as cloud systems.
-    Transparent logic. No black boxes.
+    Cloude is a cloud-native Solana interface, powered by Claude Opus
+    to improve the trenching experience.
   </p>
-  <button onclick="launch()">Launch Cloud</button>
+  <button id="launchBtn">Launch Cloud</button>
+  <div id="status">Idle ☁️</div>
 </section>
 
 <section class="dashboard">
   <div class="panel">
-    <h3>Total Cloud Altitude</h3>
-    <div class="chart" id="chart"></div>
+    <h3>Cloud Energy</h3>
+    <div class="energy"><span id="energyBar"></span></div>
   </div>
   <div class="panel">
-    <h3>About CLOUDE</h3>
-    <p>
-      Cloud logic written by Claude Opus ☁️
-    </p>
+    <h3>System</h3>
+    <p>Cloud logic written by Claude Opus ☁️</p>
   </div>
 </section>
 
 <section class="clouds">
   <div class="cloud-card">
+    <div class="cloud-icon"></div>
     <h4>Cumulus</h4>
-    <p>Stable drift</p>
     <button onclick="selectCloud('Cumulus')">Select</button>
   </div>
   <div class="cloud-card">
+    <div class="cloud-icon"></div>
     <h4>Stratus</h4>
-    <p>Balanced drift</p>
     <button onclick="selectCloud('Stratus')">Select</button>
   </div>
   <div class="cloud-card">
+    <div class="cloud-icon"></div>
     <h4>Nimbus</h4>
-    <p>Aggressive drift</p>
     <button onclick="selectCloud('Nimbus')">Select</button>
   </div>
 </section>
 
 <footer>
-  © CLOUDE — Solana-native cloud logic
+  CLOUDE — powered by Claude Opus ☁️
 </footer>
 
 <script>
-  const state = {
-    connected: false,
-    activeCloud: null,
-    altitude: 100
-  };
+const state={
+  connected:false,
+  cloud:null,
+  energy:40
+};
 
-  function toast(msg) {
-    alert(msg);
-  }
+const statusEl=document.getElementById("status");
+const energyBar=document.getElementById("energyBar");
 
-  function connect() {
-    state.connected = true;
-    toast("Connected to Solana skies ☁️");
-  }
+document.getElementById("connectBtn").onclick=()=>{
+  state.connected=true;
+  statusEl.innerText="Connected to Solana skies ☁️";
+};
 
-  function launch() {
-    if (!state.connected) {
-      toast("Connect first ☁️");
-      return;
-    }
-    if (!state.activeCloud) {
-      toast("Select a cloud ☁️");
-      return;
-    }
-    toast("Cloud launched 🌤️");
-  }
+document.getElementById("launchBtn").onclick=()=>{
+  if(!state.connected){statusEl.innerText="Connect first ☁️";return}
+  if(!state.cloud){statusEl.innerText="Select a cloud ☁️";return}
+  statusEl.innerText=`${state.cloud} drifting… ☁️`;
+  drift();
+};
 
-  function selectCloud(type) {
-    state.activeCloud = type;
-    state.altitude = 100;
-    renderChart();
-    toast(type + " cloud selected ☁️");
-  }
+function selectCloud(type){
+  state.cloud=type;
+  state.energy=40;
+  updateEnergy();
+  statusEl.innerText=`${type} cloud selected ☁️`;
+}
 
-  function renderChart() {
-    const chart = document.getElementById("chart");
-    chart.innerHTML = "";
-    for (let i = 0; i < 18; i++) {
-      const bar = document.createElement("div");
-      bar.className = "bar";
-      bar.style.height = (Math.random() * 80 + 40) + "%";*
+function drift(){
+  setInterval(()=>{
+    state.energy=Math.min(100,Math.max(10,state.energy+(Math.random()*20-10)));
+    updateEnergy();
+  },1200);
+}
+
+function updateEnergy(){
+  energyBar.style.width=state.energy+"%";
+}
+
+/* BOOT */
+setTimeout(()=>document.getElementById("boot").classList.add("hidden"),1200);
+</script>
+
+</body>
+</html>
