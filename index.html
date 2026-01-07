@@ -1,177 +1,217 @@
-<script>
-/*
-  CLOUDE SYSTEM CORE
-  Written by Claude Opus ☁️
-  Cloud-native logic for Solana-era markets
-*/
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CLOUDE ☁️</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-const CLOUDE = {
-  state: {
+  <style>
+    :root {
+      --cloud-orange: #d97a55;
+      --sky1: #fff3ea;
+      --sky2: #ffffff;
+      --text: #1f2937;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Inter, system-ui, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, var(--sky1), var(--sky2));
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 20px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.9);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    button {
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: none;
+      background: var(--cloud-orange);
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .hero {
+      padding: 80px 24px;
+      text-align: center;
+    }
+
+    .hero h2 {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      max-width: 640px;
+      margin: 0 auto 24px;
+      opacity: 0.8;
+    }
+
+    .dashboard {
+      max-width: 1100px;
+      margin: auto;
+      padding: 40px 24px;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    .panel {
+      background: rgba(255,255,255,0.9);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+    }
+
+    .chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 240px;
+    }
+
+    .bar {
+      flex: 1;
+      background: var(--cloud-orange);
+      border-radius: 8px 8px 0 0;
+    }
+
+    .clouds {
+      max-width: 1100px;
+      margin: auto;
+      padding: 40px 24px 80px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+      gap: 20px;
+    }
+
+    .cloud-card {
+      background: rgba(255,255,255,0.9);
+      border-radius: 24px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px;
+      opacity: 0.6;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>☁️ CLOUDE</h1>
+  <button onclick="connect()">Connect</button>
+</header>
+
+<section class="hero">
+  <h2>Markets, but Cloudy ☁️</h2>
+  <p>
+    CLOUDE visualizes market drift as cloud systems.
+    Transparent logic. No black boxes.
+  </p>
+  <button onclick="launch()">Launch Cloud</button>
+</section>
+
+<section class="dashboard">
+  <div class="panel">
+    <h3>Total Cloud Altitude</h3>
+    <div class="chart" id="chart"></div>
+  </div>
+  <div class="panel">
+    <h3>About CLOUDE</h3>
+    <p>
+      Cloud logic written by Claude Opus ☁️
+    </p>
+  </div>
+</section>
+
+<section class="clouds">
+  <div class="cloud-card">
+    <h4>Cumulus</h4>
+    <p>Stable drift</p>
+    <button onclick="selectCloud('Cumulus')">Select</button>
+  </div>
+  <div class="cloud-card">
+    <h4>Stratus</h4>
+    <p>Balanced drift</p>
+    <button onclick="selectCloud('Stratus')">Select</button>
+  </div>
+  <div class="cloud-card">
+    <h4>Nimbus</h4>
+    <p>Aggressive drift</p>
+    <button onclick="selectCloud('Nimbus')">Select</button>
+  </div>
+</section>
+
+<footer>
+  © CLOUDE — Solana-native cloud logic
+</footer>
+
+<script>
+  const state = {
     connected: false,
     activeCloud: null,
-    altitude: 100,
-    driftTimer: null
-  },
+    altitude: 100
+  };
 
-  clouds: {
-    Cumulus: {
-      volatility: 0.4,
-      description: "Slow, stable accumulation cloud"
-    },
-    Stratus: {
-      volatility: 0.7,
-      description: "Balanced cloud with adaptive drift"
-    },
-    Nimbus: {
-      volatility: 1.2,
-      description: "Storm cloud reacting aggressively"
+  function toast(msg) {
+    alert(msg);
+  }
+
+  function connect() {
+    state.connected = true;
+    toast("Connected to Solana skies ☁️");
+  }
+
+  function launch() {
+    if (!state.connected) {
+      toast("Connect first ☁️");
+      return;
     }
-  }
-};
-
-/* -------------------------
-   UI HELPERS
---------------------------*/
-
-function toast(message) {
-  const t = document.createElement("div");
-  t.innerText = message;
-  t.style.position = "fixed";
-  t.style.bottom = "24px";
-  t.style.left = "50%";
-  t.style.transform = "translateX(-50%)";
-  t.style.padding = "12px 20px";
-  t.style.borderRadius = "999px";
-  t.style.background = "#d97a55";
-  t.style.color = "white";
-  t.style.fontWeight = "700";
-  t.style.boxShadow = "0 10px 30px rgba(0,0,0,0.25)";
-  t.style.zIndex = 9999;
-  document.body.appendChild(t);
-
-  setTimeout(() => t.remove(), 2600);
-}
-
-/* -------------------------
-   WALLET (MOCK, REALISTIC)
---------------------------*/
-
-function connect() {
-  if (CLOUDE.state.connected) {
-    toast("Already connected ☁️");
-    return;
+    if (!state.activeCloud) {
+      toast("Select a cloud ☁️");
+      return;
+    }
+    toast("Cloud launched 🌤️");
   }
 
-  // Placeholder for Phantom / Solana adapter
-  CLOUDE.state.connected = true;
-  toast("Cloud connected to Solana skies ☁️🟣");
-}
-
-/* -------------------------
-   CLOUD SELECTION
---------------------------*/
-
-function selectCloud(type) {
-  if (!CLOUDE.clouds[type]) return;
-
-  CLOUDE.state.activeCloud = type;
-  CLOUDE.state.altitude = 100;
-
-  toast(`${type} cloud formed ☁️`);
-
-  startDrift();
-}
-
-/* -------------------------
-   DRIFT ENGINE (CORE LOGIC)
---------------------------*/
-
-function startDrift() {
-  stopDrift();
-
-  CLOUDE.state.driftTimer = setInterval(() => {
-    const cloud = CLOUDE.clouds[CLOUDE.state.activeCloud];
-    if (!cloud) return;
-
-    const movement =
-      (Math.random() - 0.45) * cloud.volatility * 10;
-
-    CLOUDE.state.altitude = Math.max(
-      60,
-      CLOUDE.state.altitude + movement
-    );
-
-    updateChart();
-  }, 1200);
-}
-
-function stopDrift() {
-  if (CLOUDE.state.driftTimer) {
-    clearInterval(CLOUDE.state.driftTimer);
-    CLOUDE.state.driftTimer = null;
-  }
-}
-
-/* -------------------------
-   LAUNCH ACTION
---------------------------*/
-
-function launch() {
-  if (!CLOUDE.state.connected) {
-    toast("Connect to the sky first ☁️");
-    return;
+  function selectCloud(type) {
+    state.activeCloud = type;
+    state.altitude = 100;
+    renderChart();
+    toast(type + " cloud selected ☁️");
   }
 
-  if (!CLOUDE.state.activeCloud) {
-    toast("Select a cloud before launch ☁️");
-    return;
-  }
-
-  toast("Cloud deployed into live drift 🌤️");
-}
-
-/* -------------------------
-   CHART (ALTITUDE VISUAL)
---------------------------*/
-
-const chart = document.getElementById("chart");
-
-function updateChart() {
-  if (!chart) return;
-
-  chart.innerHTML = "";
-
-  for (let i = 0; i < 18; i++) {
-    const bar = document.createElement("div");
-    bar.className = "bar";
-
-    const variance =
-      (Math.random() * 20 - 10) +
-      (CLOUDE.state.altitude - 100);
-
-    bar.style.height = Math.max(20, 60 + variance) + "%";
-    bar.style.background = "#ffffff";
-
-    chart.appendChild(bar);
-  }
-}
-
-/* -------------------------
-   SCROLL
---------------------------*/
-
-function scrollToSection(id) {
-  document.getElementById(id)?.scrollIntoView({
-    behavior: "smooth"
-  });
-}
-
-/* -------------------------
-   INIT
---------------------------*/
-
-updateChart();
-</script>
-<p style="opacity:0.6;font-size:14px">
-  Cloud logic written by Claude Opus ☁️
-</p>
+  function renderChart() {
+    const chart = document.getElementById("chart");
+    chart.innerHTML = "";
+    for (let i = 0; i < 18; i++) {
+      const bar = document.createElement("div");
+      bar.className = "bar";
+      bar.style.height = (Math.random() * 80 + 40) + "%";*
